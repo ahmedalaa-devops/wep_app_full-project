@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     stages {
-
         stage('Checkout') {
             steps {
                 git 'https://github.com/ahmedalaa-devops/wep_app_full-project.git'
@@ -17,18 +16,19 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-    sh '''
-    export KUBECONFIG=$KUBECONFIG
-    kubectl apply -f deployment.yaml
-    '''
-                }
+                sh '''
+                export KUBECONFIG=/var/lib/jenkins/.kube/config
+                kubectl apply -f deployment.yaml
+                '''
             }
         }
 
         stage('Verify') {
             steps {
-                sh 'kubectl get pods'
+                sh '''
+                export KUBECONFIG=/var/lib/jenkins/.kube/config
+                kubectl get pods
+                '''
             }
         }
     }
